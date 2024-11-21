@@ -1,6 +1,6 @@
-from aiogram import Router, F, types
-from bot import bot, dp
-from aiogram.filters import Command, StateFilter
+from aiogram import Router, F
+from bot import bot
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, FSInputFile, URLInputFile, BufferedInputFile
@@ -13,7 +13,7 @@ router = Router()
 # Эти значения далее будут подставляться в итоговый текст, отсюда
 # такая на первый взгляд странная форма прилагательных
 start_button = ["Начать"]
-license = ['Да, согласен(на)', " Нет, хочу уточнить детали (переход на контакт для связи)"]
+license = ['Да, согласен(на)', " Нет, хочу уточнить детали"]
 pircing_choose = ["Прокол ушка", "Прокол лица", 'Микродермал', 'Прокол сосков']
 pircing_experience = [" У меня уже есть пирсинг", "Это мой первый раз"]
 ear_pircing = ["1. Мочка", "2. Хеликс", "3. Трагус", "4. Дейс", "5. Руук", "6. Конч"]
@@ -36,13 +36,15 @@ class ModelPircing(StatesGroup):
 async def cmd_food(message: Message, state: FSMContext):
 
     await message.answer(
-        text="Привет! Это студия VOYAGE. В нашей студии регулярно проходит обучение пирсингу и нашим ученикам нужны модели для отработки разных видов проколов В этом боте вы сможете оставить свои данные и выбрать типы проколов, которые хотите сделать в качестве модели. Процедура для моделей бесплатная, оплачивается только выбранное вами украшение из ассортимента нашей студии. Все проколы выполняются под контролем топ мастера Якова, так что вы в надежных руках 🧡",
+        text="<b>Привет!\nЭто студия VOYAGE.</b>\n\nВ нашей студии регулярно проходит обучение пирсингу"
+            f"и нашим ученикам нужны модели для отработки разных видов проколов В этом боте"
+            f"вы сможете оставить свои данные и выбрать типы проколов, которые хотите сделать"
+            f"в качестве модели.\n\nПроцедура для моделей бесплатная, <u>оплачивается только выбранное</u>"
+            f"<u>вами украшение из ассортимента нашей студии</u>.\n\n<b><u>Все проколы выполняются под контролем топ</u></b>"
+            f"<b><u>мастера Якова, так что вы в надежных руках</u></b> 🧡",   
         reply_markup=make_row_keyboard(start_button)
     )
-    # Устанавливаем пользователю состояние "выбирает название"
     await state.set_state(ModelPircing.start_state)
-
-# Этап выбора блюда #
 
 
 @router.message(ModelPircing.start_state, F.text.in_(start_button))
@@ -58,7 +60,9 @@ async def food_chosen(message: Message, state: FSMContext):
 @router.message(ModelPircing.info_about_model, F.text == license[0])
 async def model_contact(message: Message, state: FSMContext):
     await state.update_data(model_info=message.text.lower())
-    await message.answer(text='Пожалуйста, укажите свои данные одним сообщением в формате: ФИО, дата рождения (дд.мм.гггг), номер телефона.”\n• Пример: “Иванов Иван Иванович, 01.01.2000, +7 900 123 45 67.”', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text=f"Пожалуйста, укажите свои данные одним сообщением в формате:\n\n"
+                          f"<b>ФИО\nДата рождения (дд.мм.гггг)\nВаш номер телефона</b>\n\n<i>Пример:</i>" 
+                          f"<i>Иванов Иван Иванович\n01.01.2000\n+7 900 123 45 67</i>", reply_markup=ReplyKeyboardRemove())
     await state.set_state(ModelPircing.model_pircing)
 
 
@@ -116,11 +120,15 @@ async def exp_pirc(message: Message, state: FSMContext):
 async def correct_data(message: Message, state: FSMContext):
     user_data = await state.get_data()
     name = str(user_data["model_pircing"]).title()
-    model_pircing = str(user_data['exp_pirc'])[2:]
+    if any(map(str.isdigit, user_data['exp_pirc'])) == True:
+        model_pircing = str(user_data['exp_pirc'])[3:]
+    else:
+         model_pircing = user_data['exp_pirc']
 
-    await message.answer(text=f'Проверьте введённые данные и выбранные проколы. Всё ли верно?\n'
-                            f"{model_pircing}\n"
-                            f"{name}", reply_markup=make_row_keyboard(confirm_data))
+    await message.answer(text=f"Проверьте введённые данные и выбранные проколы. Всё ли верно?\n"
+                            f"Прокол: {model_pircing}\n"
+                            f"{name}", 
+                            reply_markup=make_row_keyboard(confirm_data))
     await state.set_state(ModelPircing.confirm)
 
 
@@ -129,9 +137,16 @@ async def correct_data(message: Message, state: FSMContext):
 async def exp_pirc(message: Message, state: FSMContext):
     user_data = await state.get_data()
     name = str(user_data["model_pircing"]).title()
-    model_pircing = str(user_data['exp_pirc'])[2:]
 
-    await message.answer(text='Спасибо за вашу заявку! Мы свяжемся с вами, как только появится возможность для участия в обучении. До встречи в студии VOYAGE!',
+    if any(map(str.isdigit, user_data['exp_pirc'])) == True:
+        model_pircing = str(user_data['exp_pirc'])[3:]
+    else:
+         model_pircing = user_data['exp_pirc']
+
+    model_pircing = str(user_data['exp_pirc'])[3:]
+    await message.answer(text=f"Спасибо за вашу заявку! 🧡\n\n"
+                            f"Мы свяжемся с вами, как только появится возможность для участия в обучении\n\n"
+                            f"До встречи в студии VOYAGE ✨",
                          reply_markup=ReplyKeyboardRemove())
     await bot.send_message('-4516436729',
                            text=f'Новая заявка\nМодель: {name}\nПирсинг: {model_pircing}')
@@ -141,45 +156,8 @@ async def exp_pirc(message: Message, state: FSMContext):
 
 @router.message(ModelPircing.confirm, F.text == confirm_data[1])
 async def exp_pirc(message: Message, state: FSMContext):
-    await state.set_state(ModelPircing.start_state)
     await state.clear()
-
-
-
-
-
-
-
-# В целом, никто не мешает указывать стейты полностью строками
-# Это может пригодиться, если по какой-то причине 
-# ваши названия стейтов генерируются в рантайме (но зачем?)
-@router.message(StateFilter("OrderFood:choosing_food_name"))
-async def food_chosen_incorrectly(message: Message):
     await message.answer(
-        text="Я не знаю такого блюда.\n\n"
-             "Пожалуйста, выберите одно из названий из списка ниже:",
+        text="Для повторной заявки напишите /start",
         reply_markup=ReplyKeyboardRemove()
     )
-
-# Этап выбора размера порции и отображение сводной информации #
-
-
-# @router.message(OrderFood.choosing_food_size, F.text.in_(available_food_sizes))
-# async def food_size_chosen(message: Message, state: FSMContext):
-#     user_data = await state.get_data()
-#     await message.answer(
-#         text=f"Вы выбрали {message.text.lower()} порцию {user_data['chosen_food']}.\n"
-#              f"Попробуйте теперь заказать напитки: /drinks",
-#         reply_markup=ReplyKeyboardRemove()
-#     )
-#     # Сброс состояния и сохранённых данных у пользователя
-#     await state.clear()
-
-
-# @router.message(OrderFood.choosing_food_size)
-# async def food_size_chosen_incorrectly(message: Message):
-#     await message.answer(
-#         text="Я не знаю такого размера порции.\n\n"
-#              "Пожалуйста, выберите один из вариантов из списка ниже:",
-#         reply_markup=make_row_keyboard(available_food_sizes)
-#     )
