@@ -61,7 +61,7 @@ async def food_chosen(message: Message, state: FSMContext):
 async def model_contact(message: Message, state: FSMContext):
     await state.update_data(model_info=message.text.lower())
     await message.answer(text=f"Пожалуйста, укажите свои данные одним сообщением в формате:\n\n"
-                          f"<b>ФИО\nДата рождения (дд.мм.гггг)\nВаш номер телефона</b>\n\n<i>Пример:</i>" 
+                          f"<b>ФИО\nДата рождения (дд.мм.гггг)\nВаш номер телефона</b>\n\n<i>Пример: </i>" 
                           f"<i>Иванов Иван Иванович\n01.01.2000\n+7 900 123 45 67</i>", reply_markup=ReplyKeyboardRemove())
     await state.set_state(ModelPircing.model_pircing)
 
@@ -77,7 +77,7 @@ async def pircing_model(message: Message, state: FSMContext):
 @router.message(ModelPircing.pircing_choosing, F.text == pircing_choose[0])
 async def ear_choose(message: Message, state: FSMContext):
     file_ids = []
-    ear_photo = FSInputFile("img/ear_pircing.jpg")
+    ear_photo = FSInputFile("img/ear_pircing.PNG")
     await state.update_data(ear_pircing=message.text.lower())
     result = await message.answer_photo(
         ear_photo,
@@ -120,11 +120,11 @@ async def exp_pirc(message: Message, state: FSMContext):
 async def correct_data(message: Message, state: FSMContext):
     user_data = await state.get_data()
     name = str(user_data["model_pircing"]).title()
+
     if any(map(str.isdigit, user_data['exp_pirc'])) == True:
         model_pircing = str(user_data['exp_pirc'])[3:]
     else:
          model_pircing = user_data['exp_pirc']
-
     await message.answer(text=f"Проверьте введённые данные и выбранные проколы. Всё ли верно?\n"
                             f"Прокол: {model_pircing}\n"
                             f"{name}", 
