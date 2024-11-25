@@ -77,14 +77,16 @@ async def pircing_model(message: Message, state: FSMContext):
 @router.message(ModelPircing.pircing_choosing, F.text == pircing_choose[0])
 async def ear_choose(message: Message, state: FSMContext):
     file_ids = []
-    ear_photo = FSInputFile("img/ear_pircing.PNG")
-    await state.update_data(ear_pircing=message.text.lower())
-    result = await message.answer_photo(
-        ear_photo,
-        caption="Выберете место для прокола",
-        reply_markup=make_row_keyboard(ear_pircing)
-    )
-    file_ids.append(result.photo[-1].file_id)
+    with open("./img/ear_pircing.jpg", "rb") as image_from_buffer:
+        result = await message.answer_photo(
+            BufferedInputFile(
+                image_from_buffer.read(),
+                filename="image from buffer.jpg"
+            ),
+            caption="Выберете место для прокола",
+            reply_markup=make_row_keyboard(ear_pircing)
+        )
+        file_ids.append(result.photo[-1].file_id)
     await state.set_state(ModelPircing.pircing_exp)
 
 
