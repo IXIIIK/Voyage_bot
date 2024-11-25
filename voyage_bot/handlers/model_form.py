@@ -77,7 +77,7 @@ async def pircing_model(message: Message, state: FSMContext):
 @router.message(ModelPircing.pircing_choosing, F.text == pircing_choose[0])
 async def ear_choose(message: Message, state: FSMContext):
     file_ids = []
-    with open("./img/ear_pircing.jpg", "rb") as image_from_buffer:
+    with open("voyage_bot/img/ear_pircing.jpg", "rb") as image_from_buffer:
         result = await message.answer_photo(
             BufferedInputFile(
                 image_from_buffer.read(),
