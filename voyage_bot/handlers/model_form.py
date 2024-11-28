@@ -3,7 +3,7 @@ from bot import bot
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from aiogram.types import Message, ReplyKeyboardRemove, FSInputFile, URLInputFile, BufferedInputFile
+from aiogram.types import Message, ReplyKeyboardRemove, BufferedInputFile
 
 from keyboards.simple_row import make_row_keyboard
 
@@ -32,7 +32,6 @@ class ModelPircing(StatesGroup):
 
 
 @router.message(Command("start"))
-#@dp.message(content_types=['new_chat_members'])
 async def cmd_food(message: Message, state: FSMContext):
 
     await message.answer(
@@ -66,6 +65,14 @@ async def model_contact(message: Message, state: FSMContext):
     await state.set_state(ModelPircing.model_pircing)
 
 
+@router.message(ModelPircing.info_about_model, F.text == license[1])
+async def manager(message: Message, state: FSMContext):
+    await state.update_data(model_info=message.text.lower())
+    await message.answer(text='Для уточнения условий, напишите нашему менеджеру', reply_markup=ReplyKeyboardRemove())
+    await bot.send_contact('7071604847', '', 'Менеджер', 'Voyage')
+    await state.set_state(ModelPircing.model_pircing)
+
+
 @router.message(ModelPircing.model_pircing)
 async def pircing_model(message: Message, state: FSMContext):
     await state.update_data(model_pircing=message.text.lower())
@@ -77,7 +84,7 @@ async def pircing_model(message: Message, state: FSMContext):
 @router.message(ModelPircing.pircing_choosing, F.text == pircing_choose[0])
 async def ear_choose(message: Message, state: FSMContext):
     file_ids = []
-    with open("voyage_bot/img/ear_pircing.jpg", "rb") as image_from_buffer:
+    with open("voyage_bot/ear_pircing.jpg", "rb") as image_from_buffer:
         result = await message.answer_photo(
             BufferedInputFile(
                 image_from_buffer.read(),
@@ -85,7 +92,7 @@ async def ear_choose(message: Message, state: FSMContext):
             ),
             caption="Выберете место для прокола",
             reply_markup=make_row_keyboard(ear_pircing)
-        )
+            )
         file_ids.append(result.photo[-1].file_id)
     await state.set_state(ModelPircing.pircing_exp)
 
