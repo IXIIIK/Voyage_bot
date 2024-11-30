@@ -13,7 +13,7 @@ router = Router()
 # Эти значения далее будут подставляться в итоговый текст, отсюда
 # такая на первый взгляд странная форма прилагательных
 start_button = ["Начать"]
-license = ['Да, согласен(на)', " Нет, хочу уточнить детали"]
+license = ['Да, согласен(на)', 'Нет, хочу уточнить детали']
 pircing_choose = ["Прокол ушка", "Прокол лица", 'Микродермал', 'Прокол сосков']
 pircing_experience = [" У меня уже есть пирсинг", "Это мой первый раз"]
 ear_pircing = ["1. Мочка", "2. Хеликс", "3. Трагус", "4. Дейс", "5. Руук", "6. Конч"]
@@ -36,7 +36,7 @@ async def cmd_food(message: Message, state: FSMContext):
 
     await message.answer(
         text="<b>Привет!\nЭто студия VOYAGE.</b>\n\nВ нашей студии регулярно проходит обучение пирсингу"
-            f"и нашим ученикам нужны модели для отработки разных видов проколов В этом боте"
+            f"и нашим ученикам нужны модели для отработки разных видов проколов В этом боте "
             f"вы сможете оставить свои данные и выбрать типы проколов, которые хотите сделать"
             f"в качестве модели.\n\nПроцедура для моделей бесплатная, <u>оплачивается только выбранное</u>"
             f"<u>вами украшение из ассортимента нашей студии</u>.\n\n<b><u>Все проколы выполняются под контролем топ</u></b>"
@@ -66,10 +66,9 @@ async def model_contact(message: Message, state: FSMContext):
 
 
 @router.message(ModelPircing.info_about_model, F.text == license[1])
-async def manager(message: Message, state: FSMContext):
-    await state.update_data(model_info=message.text.lower())
-    await message.answer(text='Для уточнения условий, напишите нашему менеджеру', reply_markup=ReplyKeyboardRemove())
-    await bot.send_contact('7071604847', '', 'Менеджер', 'Voyage')
+async def manager_contact(message: Message, state: FSMContext):   
+    await message.answer(text=f"<b><a href='https://t.me/voyagemoscow'>Для уточнения деталий. Напишите нашему менеджеру</a></b>", reply_markup=ReplyKeyboardRemove())
+    #await bot.send_contact('7895835700', '89252792739', 'Менеджер', 'Voyage')
     await state.set_state(ModelPircing.model_pircing)
 
 
@@ -133,7 +132,7 @@ async def correct_data(message: Message, state: FSMContext):
     if any(map(str.isdigit, user_data['exp_pirc'])) == True:
         model_pircing = str(user_data['exp_pirc'])[3:]
     else:
-         model_pircing = user_data['exp_pirc']
+        model_pircing = user_data['exp_pirc']
     await message.answer(text=f"Проверьте введённые данные и выбранные проколы. Всё ли верно?\n"
                             f"Прокол: {model_pircing}\n"
                             f"{name}", 
@@ -150,9 +149,7 @@ async def exp_pirc(message: Message, state: FSMContext):
     if any(map(str.isdigit, user_data['exp_pirc'])) == True:
         model_pircing = str(user_data['exp_pirc'])[3:]
     else:
-         model_pircing = user_data['exp_pirc']
-
-    model_pircing = str(user_data['exp_pirc'])[3:]
+        model_pircing = user_data['exp_pirc']
     await message.answer(text=f"Спасибо за вашу заявку! 🧡\n\n"
                             f"Мы свяжемся с вами, как только появится возможность для участия в обучении\n\n"
                             f"До встречи в студии VOYAGE ✨",
