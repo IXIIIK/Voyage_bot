@@ -19,6 +19,7 @@ pircing_experience = [" У меня уже есть пирсинг", "Это м�
 ear_pircing = ["1. Мочка", "2. Хеликс", "3. Трагус", "4. Дейс", "5. Руук", "6. Конч"]
 face_pircing = ["Бровь", "Крыло носа", "Септум", "Прокол губы", "Медуза", "Смайл", "Язык"]
 confirm_data = ['Да, всё верно', 'Нет, хочу изменить данные (возвращение к началу)']
+CONTINUE = ['Продолжить']
 
 
 class ModelPircing(StatesGroup):
@@ -67,7 +68,7 @@ async def model_contact(message: Message, state: FSMContext):
 
 @router.message(ModelPircing.info_about_model, F.text == license[1])
 async def manager_contact(message: Message, state: FSMContext):   
-    await message.answer(text=f"<b><a href='https://t.me/voyagemoscow'>Для уточнения деталий. Напишите нашему менеджеру</a></b>", reply_markup=ReplyKeyboardRemove())
+    await message.answer(text=f"<b><a href='https://t.me/voyagemoscow'>Для уточнения деталий. Напишите нашему менеджеру</a></b>", reply_markup=make_row_keyboard(CONTINUE))
     #await bot.send_contact('7895835700', '89252792739', 'Менеджер', 'Voyage')
     await state.set_state(ModelPircing.model_pircing)
 
