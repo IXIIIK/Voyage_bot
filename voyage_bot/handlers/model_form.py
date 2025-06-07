@@ -147,6 +147,7 @@ async def confirm_submission(message: Message, state: FSMContext):
     user_data = await state.get_data()
     name = str(user_data.get("model_pircing", "")).title()
     pierce = user_data.get('exp_pirc', '')
+    pirc_experience = user_data.get('pircing_exp', '')
     place = user_data.get('chosen_place', '')
     full_pierce = f"{pierce} - {place}" if place else pierce
 
@@ -156,7 +157,9 @@ async def confirm_submission(message: Message, state: FSMContext):
                          reply_markup=ReplyKeyboardRemove())
 
     await bot.send_message('-4516436729',
-                           text=f'Новая заявка\nМодель: {name}\nПирсинг: {full_pierce}')
+                           text=f'Новая заявка\nМодель: {name}\n\
+                           Пирсинг: {full_pierce}\n\
+                           Опыт в пирсинге: {pirc_experience}')
     await state.clear()
 
 
