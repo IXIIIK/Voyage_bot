@@ -1,2 +1,6 @@
-aiogram<4.0
+aiogram
+python-dotenv
+pip-audit
+
+pydantic
 pydantic-settings
